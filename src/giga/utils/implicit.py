@@ -1,7 +1,7 @@
 import os
 import trimesh
 import numpy as np
-from urdfpy import URDF
+# from urdfpy import URDF
 try:
     from giga.ConvONets.utils.libmesh import check_mesh_contains
 except:
@@ -50,30 +50,30 @@ def get_mesh_pose_list_from_world(world, object_set, exclude_plane=True):
         mesh_pose_list.append((mesh_path, scale, pose))
     return mesh_pose_list
 
-def get_scene_from_mesh_pose_list(mesh_pose_list, scene_as_mesh=True, return_list=False):
-    # create scene from meshes
-    scene = trimesh.Scene()
-    mesh_list = []
-    for mesh_path, scale, pose in mesh_pose_list:
-        if os.path.splitext(mesh_path)[1] == '.urdf':
-            obj = URDF.load(mesh_path)
-            assert len(obj.links) == 1
-            assert len(obj.links[0].visuals) == 1
-            assert len(obj.links[0].visuals[0].geometry.meshes) == 1
-            mesh = obj.links[0].visuals[0].geometry.meshes[0].copy()
-        else:
-            mesh = trimesh.load(mesh_path)
+# def get_scene_from_mesh_pose_list(mesh_pose_list, scene_as_mesh=True, return_list=False):
+#     # create scene from meshes
+#     scene = trimesh.Scene()
+#     mesh_list = []
+#     for mesh_path, scale, pose in mesh_pose_list:
+#         if os.path.splitext(mesh_path)[1] == '.urdf':
+#             obj = URDF.load(mesh_path)
+#             assert len(obj.links) == 1
+#             assert len(obj.links[0].visuals) == 1
+#             assert len(obj.links[0].visuals[0].geometry.meshes) == 1
+#             mesh = obj.links[0].visuals[0].geometry.meshes[0].copy()
+#         else:
+#             mesh = trimesh.load(mesh_path)
 
-        mesh.apply_scale(scale)
-        mesh.apply_transform(pose)
-        scene.add_geometry(mesh)
-        mesh_list.append(mesh)
-    if scene_as_mesh:
-        scene = as_mesh(scene)
-    if return_list:
-        return scene, mesh_list
-    else:
-        return scene
+#         mesh.apply_scale(scale)
+#         mesh.apply_transform(pose)
+#         scene.add_geometry(mesh)
+#         mesh_list.append(mesh)
+#     if scene_as_mesh:
+#         scene = as_mesh(scene)
+#     if return_list:
+#         return scene, mesh_list
+#     else:
+#         return scene
 
 def sample_iou_points(mesh_list, bounds, num_point, padding=0.02, uniform=False, size=0.3):
     points = np.random.rand(num_point, 3).astype(np.float32)
