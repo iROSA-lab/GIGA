@@ -12,10 +12,12 @@ from giga.utils.misc import apply_noise, apply_translational_noise
 
 
 class ClutterRemovalSim(object):
-    def __init__(self, scene, object_set, gui=True, seed=None, add_noise=False, sideview=False, save_dir=None, save_freq=8):
+    def __init__(self, scene, object_set, gui=True, seed=None, add_noise=False, sideview=False, save_dir=None, save_freq=8, data_root=None):
         assert scene in ["pile", "packed"]
 
         self.urdf_root = Path("data/urdfs")
+        if data_root:
+            self.urdf_root = Path(data_root) / self.urdf_root
         self.scene = scene
         self.object_set = object_set
         self.discover_objects()
@@ -33,7 +35,7 @@ class ClutterRemovalSim(object):
 
         self.rng = np.random.RandomState(seed) if seed else np.random
         self.world = btsim.BtWorld(self.gui, save_dir, save_freq)
-        self.gripper = Gripper(self.world)
+        self.gripper = Gripper(self.world, data_root)
         self.size = 6 * self.gripper.finger_depth
         intrinsic = CameraIntrinsic(640, 480, 540.0, 540.0, 320.0, 240.0)
         self.camera = self.world.add_camera(intrinsic, 0.1, 2.0)
@@ -266,10 +268,13 @@ class ClutterRemovalSim(object):
 class Gripper(object):
     """Simulated Panda hand."""
 
-    def __init__(self, world):
+    def __init__(self, world, data_root=None):
         self.world = world
-        self.urdf_path = Path("data/urdfs/panda/hand.urdf")
-
+        if data_root is not None:
+            self.urdf_path = Path(data_root) / Path("data/urdfs/panda/hand.urdf")
+        else:
+            self.urdf_path = Path("data/urdfs/panda/hand.urdf")
+    
         self.max_opening_width = 0.08
         self.finger_depth = 0.05
         self.T_body_tcp = Transform(Rotation.identity(), [0.0, 0.0, 0.022])
