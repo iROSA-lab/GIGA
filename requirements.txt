@@ -14,3 +14,4 @@ git+https://github.com/erwincoumans/urdfpy
 cython
 # scikit-image
 pykdtree
+numpngw # for viz
